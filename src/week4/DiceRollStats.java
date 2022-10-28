@@ -54,8 +54,7 @@ public class DiceRollStats {
      *    that could possibly come up on a pair of dice
      */
     public static int rollFor( int N ) {
-        if ( N < 2 || N > 12 )
-            throw new IllegalArgumentException("Impossible total for a pair of dice.");
+
         int die1, die2;  // Numbers between 1 and 6 representing the dice.
         int roll;        // Total showing on dice.
         int rollCt;      // Number of rolls made.
