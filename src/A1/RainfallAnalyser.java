@@ -1,4 +1,4 @@
-package week6;
+package A1;
 
 import textio.TextIO;
 
@@ -45,8 +45,8 @@ public class RainfallAnalyser {
         int countNumOfRain = 0;
         float totalOfNum = 0;
         float rainAmong;
-        float min = Float.NEGATIVE_INFINITY;
-        float max = Float.POSITIVE_INFINITY;
+        float max = Float.NEGATIVE_INFINITY;
+        float min = Float.POSITIVE_INFINITY;
         float average;
         String[] record;
         int rowNum = 0;
@@ -129,14 +129,15 @@ public class RainfallAnalyser {
         }
 
         // check newFile(2D array)
-        /*
-        for (String[] strArr : newFile) {
-            for (int j = 0; j < strArr.length; j++) {
-                System.out.print(strArr[j]);
-            }
-            System.out.println();
-        }
-*/
+//
+//        for (String[] strArr : newFile) {
+//            for (int j = 0; j < strArr.length; j++) {
+//                System.out.print(strArr[j]);
+//            }
+//            System.out.println();
+//        }
+
+
         // get first year, month, day value
         year = Integer.parseInt(newFile[0][2]);
         month = Integer.parseInt(newFile[0][3]);
@@ -158,12 +159,12 @@ public class RainfallAnalyser {
                 totalOfNum += rowOfRain;
 
                 //check min rain among
-                if (rowOfRain > min) {
+                if (rowOfRain < min) {
                     min = rowOfRain;
                 }
 
                 //check max rain among
-                if (rowOfRain < max) {
+                if (rowOfRain > max) {
                     max = rowOfRain;
                 }
 
@@ -206,20 +207,20 @@ public class RainfallAnalyser {
                 //add month
                 month++;
                 //reset min value
-                min = Float.NEGATIVE_INFINITY;
+                max = Float.NEGATIVE_INFINITY;
                 //reset max value
-                max = Float.POSITIVE_INFINITY;
+                min = Float.POSITIVE_INFINITY;
 
                 //sum rain among
                 totalOfNum = rowOfRain;
 
                 //check min rain among
-                if (rowOfRain > min) {
+                if (rowOfRain < min) {
                     min = rowOfRain;
                 }
 
                 //check max rain among
-                if (rowOfRain < max) {
+                if (rowOfRain > max) {
                     max = rowOfRain;
                 }
 
@@ -263,20 +264,20 @@ public class RainfallAnalyser {
                 //add year
                 year++;
                 //reset min value
-                min = Float.NEGATIVE_INFINITY;
+                max = Float.NEGATIVE_INFINITY;
                 //reset max value
-                max = Float.POSITIVE_INFINITY;
+                min = Float.POSITIVE_INFINITY;
 
                 //sum rain among
                 totalOfNum = rowOfRain;
 
                 //check min rain among
-                if (rowOfRain > min) {
+                if (rowOfRain < min) {
                     min = rowOfRain;
                 }
 
                 //check max rain among
-                if (rowOfRain < max) {
+                if (rowOfRain > max) {
                     max = rowOfRain;
                 }
 
@@ -317,6 +318,7 @@ public class RainfallAnalyser {
 
         String[] fileParts = filename.split("\\.");
 
+        //test output file name
       //  System.out.println(Arrays.toString(fileParts));
 
         return fileParts[0] + "_analysed.csv";
