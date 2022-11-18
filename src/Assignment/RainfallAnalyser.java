@@ -5,7 +5,6 @@ import textio.TextIO;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 public class RainfallAnalyser {
@@ -13,7 +12,7 @@ public class RainfallAnalyser {
     /**
      * Author : Jihyung Park
      * Version : 1.0
-     * Date :
+     * Date : 11/11/2022
      * Description :
      *
      */
@@ -26,15 +25,13 @@ public class RainfallAnalyser {
         System.out.print("Enter a filename: ");
 
         String filename = TextIO.getln();
-   //     System.out.println(filename);
 
         try {
             TextIO.readFile(filename);
             System.out.println("Reading successfully");
 
-
             //generate output file
-            String outputFile = generateOutputfile(filename);
+            String outputFile = generateOutputFile(filename);
 
             //save monthly total, min and max to output file
             generateMonthlyStatistics(outputFile, filename);
@@ -47,50 +44,34 @@ public class RainfallAnalyser {
 
     private static void generateMonthlyStatistics(String outputFile, String filename) {
 
-
         //check number of rows (except first line)
-        int lineCount = -1;
-        int year = 0;
-        byte month = 0;
-        int day = 0;
-        double totalOfNum = 0;
+        String[] record;
+        //check number of colum
+        int checkColumn;
+        int year;
+        byte currentMonth;
+        byte previousMonth = 1;
         double rainAmong;
+        double totalMonthlyRainfall = 0.0;
         double max = Double.NEGATIVE_INFINITY;
         double min = Double.POSITIVE_INFINITY;
-        String[] record;
-        String[] checkColumn;
-        int rowNum = 0;
-        int columnNum = 0;
-        String[][] newFile;
-
-
-
 
         try{
             Scanner scanner = new Scanner(new FileReader(filename));
 
-
             while (scanner.hasNextLine()){
                 scanner.nextLine();
-                lineCount++;
             }
         }catch (IOException e){
             e.printStackTrace();
         }
 
-        //check total row
-        //System.out.println(lineCount);
-
-
         //read the first line and ignore it
         String line = TextIO.getln();
-        checkColumn = line.split(",");
-        columnNum = checkColumn.length;
-
+        checkColumn = line.split(",").length;
 
         //for testing only = it is not satisfied the required
         TextIO.writeFile(outputFile);
-
 
         //first row of new file
         TextIO.putln(OUTPUT_HEADER);
@@ -98,216 +79,84 @@ public class RainfallAnalyser {
         //testing
         //System.out.println(line);
 
-
-
         if(TextIO.eof()){
             System.out.println("Empty file. Aborted");
             return;
         }
 
-        //make 2D array
-        newFile = new String[lineCount][columnNum];
-
-
-
         while (!TextIO.eof()){
-
 
             //and read again
             line = TextIO.getln().trim();
 
-
             //extract info...
             record = line.split(",");
 
-            System.out.println(Arrays.toString(record));
-
             //add miss data to 0
-            if (record.length != columnNum && record.length < columnNum){
-                String[] newRecord = Arrays.copyOf(record, record.length+3);
-                for(int i = 0; i < 3; i++){
-                    newRecord[record.length + i] = "0";
+            String[] newRecord = Arrays.copyOf(record, checkColumn);
+            for (int i = 0; i < checkColumn; i++){
+                if(newRecord[i] == null || newRecord[i].equals("")){
+                    newRecord[i] = "0";
                 }
-                record = newRecord;
-
-            //add miss data to 0
-            } else if (record[6].equals("")) {
-                record[6] = "0";
-
-
             }
-            //copy array for add at 2D array
-            System.arraycopy(record, 0, newFile[rowNum], 0, 8);
-            rowNum++;
+            record = newRecord;
 
+            //update year, month, rain among
+            year = Integer.parseInt(record[2]);
+            currentMonth = Byte.parseByte(record[3]);
+            rainAmong = Double.parseDouble(record[5]);
 
+            //add rain among to total rain among
+            totalMonthlyRainfall += rainAmong;
 
-        }
+            //check min rain among
+            if (rainAmong < min) {
+                min = rainAmong;
+            }
 
-        // check newFile(2D array)
-//
-//        for (String[] strArr : newFile) {
-//            for (int j = 0; j < strArr.length; j++) {
-//                System.out.print(strArr[j]);
-//            }
-//            System.out.println();
-//        }
+            //check max rain among
+            if (rainAmong > max) {
+                max = rainAmong;
+            }
 
+            //save each month data and reset max, min
+            if (currentMonth != previousMonth){
+                saveMonthlyRecord(year, previousMonth, max, min, totalMonthlyRainfall);
 
-        // get first year, month, day value
-        year = Integer.parseInt(newFile[0][2]);
-        month = Byte.parseByte(newFile[0][3]);
-        day = Integer.parseInt(newFile[0][4]);
-
-
-        for (String[] strings : newFile) {
-
-            // String array value to Integer or Float
-            int rowOfYear = Integer.parseInt(strings[2]);
-            byte rowOfMonth = Byte.parseByte(strings[3]);
-            int rowOfDay = Integer.parseInt(strings[4]);
-            double rowOfRain = Double.parseDouble(strings[5]);
-
-            //Group value by year and month
-            if (rowOfYear == year && rowOfMonth == month && rowOfDay == day) {
-
-                //sum rain among
-                totalOfNum += rowOfRain;
-
-                //check min rain among
-                if (rowOfRain < min) {
-                    min = rowOfRain;
-                }
-
-                //check max rain among
-                if (rowOfRain > max) {
-                    max = rowOfRain;
-                }
-
-                day++;
-
-                //Group value by year and month when month change
-            } else if (rowOfYear == year && rowOfMonth == (month + 1) && rowOfDay != day) {
-
-                //total rain
-                rainAmong = totalOfNum;
-
-                //Float or Integer value to String
-                String rainAmongString = Double.toString(rainAmong);
-                String maxString = Double.toString(max);
-                String minString = Double.toString(min);
-                String yearString = Integer.toString(year);
-                String monthString = Integer.toString(month);
-
-                //Make a list of row
-                List<String> rowList = Arrays.asList(yearString, monthString, maxString, minString, rainAmongString);
-                String rowListString = String.join(",", rowList);
-
-                //test rowList
-               // System.out.println(rowList);
-
-                //Put row in analysed file
-                TextIO.putln(rowListString);
-
-                //reset day
-                day = 2;
-                //add month
-                month++;
-                //reset min value
+                previousMonth = currentMonth;
+                totalMonthlyRainfall = rainAmong;
                 max = Double.NEGATIVE_INFINITY;
-                //reset max value
                 min = Double.POSITIVE_INFINITY;
 
-                //sum rain among
-                totalOfNum = rowOfRain;
-
-                //check min rain among
-                if (rowOfRain < min) {
-                    min = rowOfRain;
+                if (rainAmong < min) {
+                    min = rainAmong;
                 }
 
                 //check max rain among
-                if (rowOfRain > max) {
-                    max = rowOfRain;
-                }
-
-
-                //Group value by year and month when year change
-            } else if (rowOfYear == (year + 1) && rowOfMonth != month && rowOfDay != day) {
-
-                //total rain
-                rainAmong = totalOfNum;
-
-                //Float or Integer value to String
-                String rainAmongString = Double.toString(rainAmong);
-                String maxString = Double.toString(max);
-                String minString = Double.toString(min);
-                String yearString = Integer.toString(year);
-                String monthString = Integer.toString(month);
-
-                //Make a list of row
-                List<String> rowList = Arrays.asList(yearString, monthString, maxString, minString, rainAmongString);
-                String rowListString = String.join(",", rowList);
-
-                //test rowList
-                //System.out.println(rowList);
-
-                //Put row in analysed file
-                TextIO.putln(rowListString);
-
-                //reset day
-                day = 2;
-                //reset month
-                month = 1;
-                //add year
-                year++;
-                //reset min value
-                max = Double.NEGATIVE_INFINITY;
-                //reset max value
-                min = Double.POSITIVE_INFINITY;
-
-                //sum rain among
-                totalOfNum = rowOfRain;
-
-                //check min rain among
-                if (rowOfRain < min) {
-                    min = rowOfRain;
-                }
-
-                //check max rain among
-                if (rowOfRain > max) {
-                    max = rowOfRain;
+                if (rainAmong > max) {
+                    max = rainAmong;
                 }
             }
         }
-
-        //add Last row
-        //total rain
-        rainAmong = totalOfNum;
-
-
-        //Float or Integer value to String
-        String rainAmongString = Double.toString(rainAmong);
-        String maxString = Double.toString(max);
-        String minString = Double.toString(min);
-        String yearString = Integer.toString(year);
-        String monthString = Integer.toString(month);
-
-        //Make a list of row
-        List<String> rowList = Arrays.asList(yearString, monthString, maxString, minString, rainAmongString);
-        String rowListString = String.join(",", rowList);
-
-        //test rowList
-        //System.out.println(rowList);
-
-        //Put row in analysed file
-        TextIO.putln(rowListString);
-
     }
 
+    private static void saveMonthlyRecord(int year, byte previousMonth, double max, double min, double totalMonthlyRainfall) {
 
+        //convert different value to string
+        String yearString = Integer.toString(year);
+        String monthString = Byte.toString(previousMonth);
+        String maxString = String.format("%.02f", max);
+        String minString = String.format("%.02f", min);
+        String totalString = String.format("%.02f", totalMonthlyRainfall);
 
-    private static String generateOutputfile(String filename) {
+        //make one string
+        String row = yearString + "," + monthString + "," + maxString + "," + minString + "," + totalString;
+
+        //add row to _analysed file
+        TextIO.putln(row);
+    }
+
+    private static String generateOutputFile(String filename) {
 
         String[] fileParts = filename.split("\\.");
 
@@ -316,7 +165,4 @@ public class RainfallAnalyser {
 
         return fileParts[0] + "_analysed.csv";
     }
-
-
-
 }
