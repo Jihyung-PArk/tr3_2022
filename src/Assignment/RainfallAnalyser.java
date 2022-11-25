@@ -11,7 +11,7 @@ public class RainfallAnalyser {
 
     /**
      * Author : Jihyung Park
-     * Version : 1.0
+     * Version : 2.0
      * Date : 11/11/2022
      * Description :
      *
