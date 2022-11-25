@@ -30,11 +30,6 @@ public class RainfallVisualiser extends Application {
      *
      */
 
-    /**
-     * Draws a picture.  The parameters width and height give the size
-     * of the drawing area, in pixels.
-     */
-
     //Margin 20 all direction
     final static Integer margin = 20;
 
