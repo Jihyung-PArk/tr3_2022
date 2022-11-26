@@ -2,6 +2,7 @@ package Assignment;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
@@ -31,16 +32,16 @@ public class RainfallVisualiser extends Application {
      */
 
     //Margin 20 all direction
-    final static Integer margin = 20;
+    final static Integer MARGIN = 20;
 
     //90 degree
-    final static Integer rotationVertical = 90;
+    final static Integer ROTATION90 = 90;
     public void drawPicture(GraphicsContext g, int width, int height, String name) {
 
         int numOfRecord;
         double max;
-        double xAxisLength = width - ( 2 * margin );
-        double yAxisLength = height - ( 2 * margin );
+        double xAxisLength = width - ( 2 * MARGIN );
+        double yAxisLength = height - ( 2 * MARGIN );
 
         //Check how many record the file has
         numOfRecord = numOfRecord(name);
@@ -58,18 +59,37 @@ public class RainfallVisualiser extends Application {
         //Reduce size of bar graph base on max rain among
         int ratioOfY= (int) ((max/yAxisLength) + 1);
         //Check how many horizontal line in it
-        int numOfRows = (int) (yAxisLength/margin);
+        int numOfRows = (int) (yAxisLength/MARGIN);
 
         //draw horizontal and vertical line
-        horizontalLine(g, width, ratioOfY, height, numOfRows);
+        horizontalLine(g, width, numOfRows);
         verticalLine(g, height, barWidth, numOfRecord);
 
         //draw horizontal label base on vertical line
         horizontalLabel(g, name, height, barWidth);
+        verticalLabel(g, height, ratioOfY, numOfRows);
         //draw bar graph
         barGraph(g, name, height, barWidth, ratioOfY);
-
     }
+    // end drawPicture()
+
+    private int numOfRecord(String name) {
+        int numOfRecord = 0;
+
+        //read file and ignore first line
+        TextIO.readFile(name);
+        TextIO.getln();
+
+        //check how many row this file has
+        while (!TextIO.eof()){
+
+            TextIO.getln();
+            numOfRecord += 1;
+        }
+
+        return numOfRecord;
+    }
+    // end numOfRecord()
 
     private double getMaxRainfall(String name) {
         double max = Double.NEGATIVE_INFINITY;
@@ -94,23 +114,7 @@ public class RainfallVisualiser extends Application {
         }
         return max;
     }
-
-    private int numOfRecord(String name) {
-        int numOfRecord = 0;
-
-        //read file and ignore first line
-        TextIO.readFile(name);
-        TextIO.getln();
-
-        //check how many row this file has
-        while (!TextIO.eof()){
-
-            TextIO.getln();
-            numOfRecord += 1;
-        }
-
-        return numOfRecord;
-    }
+    //end getMaxRainfall()
 
     private void titleLabel(GraphicsContext g, String name, int width) {
 
@@ -124,58 +128,71 @@ public class RainfallVisualiser extends Application {
             fileName = name.split("/");
             barGraphName = fileName[1];
         }
-        if(barGraphName.contains("_")){
-            fileName = barGraphName.split("_");
+        if(barGraphName.contains("_analysed.csv")){
+            fileName = barGraphName.split("_analysed.csv");
             barGraphName = fileName[0];
         }
-
+        if(barGraphName.contains("_")){
+            while (barGraphName.contains("_")){
+                barGraphName = barGraphName.replace("_", " ");
+            }
+        }
         //draw title label
-        g.fillText(barGraphName, (double) width/2, (double) margin/2);
+        g.setTextAlign(TextAlignment.CENTER);
+        g.fillText(barGraphName, (double) width/2, (double) MARGIN/2);
     }
+    //end titleLabel()
 
-    private void barGraph(GraphicsContext g, String name, int height, double barWidth, int ratioOfY) {
+    private void verticalUnitLabel(GraphicsContext g, int height) {
 
-        double totalMonthlyRainfall;
-        double gapBetweenBar = 0;
+        g.setFont(Font.font("Times New Roman",8));
 
+        // y axis unit label
+        g.rotate(ROTATION90);
+        g.fillText("Unit : millimeter(mm)", (double) height/2, (double)-MARGIN/4);
+        g.rotate(-ROTATION90);
+    }
+    //end verticalUnitLabel()
 
-        gapBetweenBar += margin;
+    private void horizontalUnitLabel(GraphicsContext g, int width, int height) {
 
-        //read file and ignore first line
-        TextIO.readFile(name);
-        TextIO.getln();
+        g.setFont(Font.font("Times New Roman",9));
+        g.setTextBaseline(VPos.BOTTOM);
 
+        //x axis unit label
+        g.fillText(" Unit : Year.Month", (double) width/2, height);
+    }
+    //end horizontalUnitLabel()
 
-        while (!TextIO.eof()){
+    private void verticalLine(GraphicsContext g, int height, double barWidth, int numOfRecord) {
 
-            //and read again
-            String line = TextIO.getln().trim();
-
-            //extract info...
-            String[] record = line.split(",");
-
-            totalMonthlyRainfall = Double.parseDouble(record[2]);
-            //reduce total rainfall base on ratio
-            double ratioOfTotalRainfall = totalMonthlyRainfall/ratioOfY;
-
-            double hue = 360 * Math.random();
-
-            g.setFill(Color.hsb(hue, 1.0, 1.0));
-            g.setStroke(Color.BLACK);
-            g.fillRect(gapBetweenBar, height - ratioOfTotalRainfall - margin, barWidth, ratioOfTotalRainfall);
-            g.strokeRect(gapBetweenBar, height - ratioOfTotalRainfall - margin, barWidth, ratioOfTotalRainfall);
-            gapBetweenBar += barWidth;
+        //draw vertical line
+        for(int i = 0; i < numOfRecord+1; i++){
+            g.strokeLine(MARGIN + (barWidth*i), MARGIN, MARGIN + (barWidth*i), height-MARGIN);
         }
     }
+    //end verticalLine()
+
+    private void horizontalLine(GraphicsContext g, int width, int numOfRows) {
+
+        //draw horizontal line
+        for(int i = 0; i < numOfRows+1; i++){
+
+            g.strokeLine(MARGIN, MARGIN + (MARGIN*i), width-MARGIN, MARGIN + (MARGIN*i));
+            g.setTextAlign(TextAlignment.CENTER);
+            g.setTextBaseline(VPos.TOP);
+        }
+    }
+    //end horizontalLine()
 
     private void horizontalLabel(GraphicsContext g, String name, int height, double barWidth) {
         String previousYear = null;
         String currentYear;
         double gapBetweenLabel = 0;
 
-        gapBetweenLabel += margin;
+        gapBetweenLabel += MARGIN;
 
-        g.setFont(Font.font("Times New Roman",8));
+        g.setFont(Font.font("Times New Roman",12));
 
         //read file and ignore first line
         TextIO.readFile(name);
@@ -197,60 +214,64 @@ public class RainfallVisualiser extends Application {
                 g.setTextAlign(TextAlignment.CENTER);
                 g.setTextBaseline(VPos.TOP);
                 g.setFill(Color.BLACK);
-                g.fillText(yearAndMonth, gapBetweenLabel, height - margin);
+                g.fillText(yearAndMonth, gapBetweenLabel, height - MARGIN);
             }
             previousYear = currentYear;
 
             gapBetweenLabel += barWidth;
         }
-
     }
+    //end horizontalLabel()
 
-    private void verticalLine(GraphicsContext g, int height, double barWidth, int numOfRecord) {
+    private void verticalLabel(GraphicsContext g, int height, int ratioOfY, int numOfRows ) {
 
-        //draw vertical line
-        for(int i = 0; i < numOfRecord+1; i++){
-            g.strokeLine(margin + (barWidth*i), margin, margin + (barWidth*i), height-margin);
-        }
-    }
-
-    private void horizontalLine(GraphicsContext g, int width, int ratioOfY, int height, int numOfRows) {
-
-        //draw horizontal line
-        for(int i = 0; i < numOfRows+1; i++){
-
-            g.strokeLine(margin, margin + (margin*i), width-margin, margin + (margin*i));
-            g.setTextAlign(TextAlignment.CENTER);
-            g.setTextBaseline(VPos.TOP);
-
+        for(int i = 1; i < numOfRows + 1; i++){
             // draw Y axis label
-            String count = Integer.toString(margin * i * ratioOfY);
-            if(i > 0){
-                g.rotate(rotationVertical);
-                g.fillText(count, height - margin - (margin*i), -margin);
-                g.rotate(-rotationVertical);
-            }
+            g.setFont(Font.font("Times New Roman",10));
+
+            String count = Integer.toString(MARGIN * i * ratioOfY);
+            g.rotate(ROTATION90);
+            g.fillText(count, height - MARGIN - (MARGIN*i), -MARGIN);
+            g.rotate(-ROTATION90);
+
         }
     }
+    //end verticalLabel()
 
-    private void horizontalUnitLabel(GraphicsContext g, int width, int height) {
 
-        g.setFont(Font.font("Times New Roman",8));
+    private void barGraph(GraphicsContext g, String name, int height, double barWidth, int ratioOfY) {
 
-        //x axis unit label
-        g.fillText(" Unit : Year.Month", (double) width/2, height- (double) (margin/4));
+        double totalMonthlyRainfall;
+        double gapBetweenBar = 0;
+
+        gapBetweenBar += MARGIN;
+
+        //read file and ignore first line
+        TextIO.readFile(name);
+        TextIO.getln();
+
+        while (!TextIO.eof()){
+
+            //and read again
+            String line = TextIO.getln().trim();
+
+            //extract info...
+            String[] record = line.split(",");
+
+            totalMonthlyRainfall = Double.parseDouble(record[2]);
+            //reduce total rainfall base on ratio
+            double ratioOfTotalRainfall = totalMonthlyRainfall/ratioOfY;
+            //set random colour on bar
+            double hue = 360 * Math.random();
+
+            g.setFill(Color.hsb(hue, 1.0, 1.0));
+            g.setStroke(Color.BLACK);
+            g.fillRect(gapBetweenBar, height - ratioOfTotalRainfall - MARGIN, barWidth, ratioOfTotalRainfall);
+            g.strokeRect(gapBetweenBar, height - ratioOfTotalRainfall - MARGIN, barWidth, ratioOfTotalRainfall);
+            gapBetweenBar += barWidth;
+        }
     }
-
-    private void verticalUnitLabel(GraphicsContext g, int height) {
-
-        g.setFont(Font.font("Times New Roman",8));
-
-        // y axis unit label
-        g.rotate(rotationVertical);
-        g.fillText("Unit : millimeter(mm)", (double) height/2, (double)-margin/4);
-        g.rotate(-rotationVertical);
-    }
-    // end drawPicture()
+    //end barGraph()
 
     @Override
     public void start(Stage stage) {
@@ -306,15 +327,18 @@ public class RainfallVisualiser extends Application {
             stage.close();
             start(new Stage());
         } );
+
         startOverButton.setPrefWidth(100);
         startOverButton.setStyle("-fx-text-fill: #0000ff");
         HBox returnButton = new HBox(startOverButton);
         returnButton.setAlignment(Pos.CENTER_RIGHT);
+        returnButton.setPadding(new Insets(0, 10, 5, 0));
         root.setBottom(returnButton);
 
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Rainfall Visualiser");
+        stage.centerOnScreen();
         stage.show();
         stage.setResizable(false);
     }
