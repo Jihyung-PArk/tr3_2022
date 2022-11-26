@@ -1,4 +1,4 @@
-package Assignment1;
+package Assignment1_proto;
 
 import textio.TextIO;
 

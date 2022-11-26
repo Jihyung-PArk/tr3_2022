@@ -13,8 +13,10 @@ public class RainfallAnalyser {
      * Author : Jihyung Park
      * Version : 2.0
      * Date : 11/11/2022
-     * Description :
-     *
+     * Description : RainfallAnalyser analyzes climate information provided by The Australian Bureau of
+     *               Meteorology (BOM). After the missing data is converted to 0, the provided files are
+     *               integrated by month and converted into total rainfall, max, min.
+
      */
 
     //define constants

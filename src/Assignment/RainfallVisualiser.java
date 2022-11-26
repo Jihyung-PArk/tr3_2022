@@ -27,8 +27,11 @@ public class RainfallVisualiser extends Application {
      *
      * Author : Jihyung Park
      * Version : 4.0
-     * Description:
-     *
+     * Date : 26/11/2022
+     * Description: RainfallVisualiser converts climate information provided by The Australian Bureau of
+     *              Meteorology (BOM) analyzed by RainfallAnalyser into graphs. RainfallVisualiser shows
+     *              the total rainfall analyzed by RainfallAnalyser in the form of a bar graph.
+     *              The x-axis is presented in time order, and the y-axis represents the total amount of rain.
      */
 
     //Margin 20 all direction
