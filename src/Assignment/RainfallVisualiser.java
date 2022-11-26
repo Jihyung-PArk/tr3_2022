@@ -129,16 +129,15 @@ public class RainfallVisualiser extends Application {
         //Classified only file name
         if(barGraphName.contains("/")){
             fileName = name.split("/");
-            barGraphName = fileName[1];
+            barGraphName = fileName[fileName.length-1];
         }
         if(barGraphName.contains("_analysed.csv")){
             fileName = barGraphName.split("_analysed.csv");
             barGraphName = fileName[0];
         }
         if(barGraphName.contains("_")){
-            while (barGraphName.contains("_")){
-                barGraphName = barGraphName.replace("_", " ");
-            }
+            barGraphName = barGraphName.replaceAll("_", " ");
+
         }
         //draw title label
         g.setTextAlign(TextAlignment.CENTER);
