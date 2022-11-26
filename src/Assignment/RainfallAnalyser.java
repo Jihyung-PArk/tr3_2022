@@ -72,14 +72,15 @@ public class RainfallAnalyser {
         String line = TextIO.getln();
         checkColumn = line.split(",").length;
 
-        //for testing only = it is not satisfied the required
+        //testing checkColumn
+        //System.out.println(line.split(",").length);
+
+        //Write new file in outputFile
         TextIO.writeFile(outputFile);
 
         //first row of new file
         TextIO.putln(OUTPUT_HEADER);
 
-        //testing
-        //System.out.println(line);
 
         if(TextIO.eof()){
             System.out.println("Empty file. Aborted");
@@ -102,6 +103,9 @@ public class RainfallAnalyser {
                 }
             }
             record = newRecord;
+
+            //testing
+            //System.out.println(Arrays.toString(record));
 
             //update year, month, rain among
             year = Integer.parseInt(record[2]);
@@ -153,6 +157,9 @@ public class RainfallAnalyser {
 
         //make one string
         String row = yearString + "," + monthString + "," + maxString + "," + minString + "," + totalString;
+
+        //testing output new file
+        //System.out.println(row);
 
         //add row to _analysed file
         TextIO.putln(row);
